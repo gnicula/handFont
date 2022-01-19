@@ -1,0 +1,5 @@
+extract bounding boxes for each glyph
+optional(centered on the glyph)
+save bounding boxes as SVGs
+learn how to create a font from SVGs
+find ideal resolution for SVGs
