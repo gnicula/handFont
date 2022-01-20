@@ -1,3 +1,5 @@
+from re import I
+import constants
 import cv2
 import numpy as np
 
@@ -15,10 +17,10 @@ def drawContours(image, contours, windowName):
 
 def preProcess(image, threshold=100):
 
-    image = cv2.resize(image, dsize=(0, 0), fx=0.4, fy=0.4,
-                       interpolation=cv2.INTER_AREA)
+    # image = cv2.resize(image, dsize=(0, 0), fx=0.4, fy=0.4,
+    #                    interpolation=cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    ret2, th3 =  cv2.threshold(image, 160, 255, cv2.THRESH_BINARY)
+    ret2, th3 = cv2.threshold(image, 160, 255, cv2.THRESH_BINARY)
     # blur = cv2.GaussianBlur(image, (3, 3), 0)
     # ret3, th3 = cv2.threshold(blur, threshold, 255,
     #                           cv2.THRESH_BINARY+cv2.THRESH_OTSU)
@@ -27,8 +29,8 @@ def preProcess(image, threshold=100):
     # eroded = cv2.morphologyEx(th3, cv2.MORPH_CLOSE, horizontalStructure)
     #eroded = cv2.dilate(eroded, kernel)
     th3 = cv2.bitwise_not(th3)
-    cv2.imshow("title", th3)
-    cv2.waitKey(0)
+    # cv2.imshow("title", th3)
+    # cv2.waitKey(0)
     return th3
 
 
@@ -36,7 +38,7 @@ def findContours(image):
     numCont, _ = cv2.findContours(
         image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     image_copy = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB) * 255
-    drawContours(image_copy, numCont, "FoundContours")
+    #drawContours(image_copy, numCont, "FoundContours")
 
     return numCont
 
@@ -50,12 +52,47 @@ def getGlyphContours(contours):
     return sorted(contours, key=contourGT, reverse=True)[:80]
 
 
+def cropGlyph(image, contour, uniVal):
+    # shrink the contour so edges arent in png
+    # cv2.crop(contour)
+    # cv2.imsave(save with name as uniVal)
+    print("contour: ", contour)
+    bbox = cv2.boundingRect(contour)
+    # drawContours(image, [contour], "test contour")
+    print("bbox: ", bbox)
+    print(image.shape)
+    img = cv2.imwrite(filename=uniVal + ".png",
+                      img=image[bbox[1]:bbox[3]+bbox[1], bbox[0]: bbox[2]+bbox[0]])
+    return img
+
+
+def createPng(image, contours):
+    # sort contours first by x then by y
+    # for each contour call cropGlyph()
+    # need to get the unicovde from x, y center of the contour
+    # and a st
+
+    sorted(contour)
+    sortedContoursY = np.array()
+    # for i in range(contours):
+    #     if contours[0]
+
+
+def createSvg(dir):
+    # call potrace() to convert pngs to SVG's with the same name
+    # Need subprocess function from python to call potrace as an exe
+    return
+
+
 if __name__ == "__main__":
     image = cv2.imread("myFont.png")
+    image = cv2.resize(image, dsize=(0, 0), fx=0.4, fy=0.4,
+                       interpolation=cv2.INTER_AREA)
     pimage = preProcess(image)
     listCont = findContours(pimage)
     pimageRGB = cv2.cvtColor(pimage, cv2.COLOR_GRAY2RGB) * 255
     gottenContours = getGlyphContours(listCont)
     print(gottenContours)
-    drawContours(pimageRGB, gottenContours, "Sorted Contours")
+    drawContours(pimageRGB, [gottenContours[1]], "Sorted Contours")
     print(len(gottenContours))
+    cropGlyph(cv2.bitwise_not(pimage), gottenContours[0], "41")
