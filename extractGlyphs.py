@@ -71,12 +71,27 @@ def createPng(image, contours):
     # for each contour call cropGlyph()
     # need to get the unicovde from x, y center of the contour
     # and a st
+    ind_to_point = []
+    for i, cont in enumerate(contours):
+        min_xVal_cont = 10000
+        min_yVal_cont = 10000
+        for point in cont:
+            if point[0][0] < min_xVal_cont:
+                min_xVal_cont = point[0][0]
+            
+            if point[0][1] < min_yVal_cont:
+                min_yVal_cont = point[0][1]
+        
+        ind_to_point.append((min_xVal_cont, min_yVal_cont, i))
+    print(ind_to_point)
 
-    sorted(contour)
-    sortedContoursY = np.array()
-    # for i in range(contours):
-    #     if contours[0]
-
+    ind_to_point.sort(key=lambda x: x[0])
+    ind_to_point.sort(key=lambda x: x[1])
+    print(ind_to_point, ind_to_point[0][2])
+    print(contours[ind_to_point[0][2]])
+    cropGlyph(image, contours[ind_to_point[0][2]], "41")
+    cropGlyph(image, contours[ind_to_point[1][2]], "42")
+  
 
 def createSvg(dir):
     # call potrace() to convert pngs to SVG's with the same name
@@ -92,7 +107,8 @@ if __name__ == "__main__":
     listCont = findContours(pimage)
     pimageRGB = cv2.cvtColor(pimage, cv2.COLOR_GRAY2RGB) * 255
     gottenContours = getGlyphContours(listCont)
-    print(gottenContours)
+    # print(len(gottenContours))
     drawContours(pimageRGB, [gottenContours[1]], "Sorted Contours")
-    print(len(gottenContours))
-    cropGlyph(cv2.bitwise_not(pimage), gottenContours[0], "41")
+    # print(len(gottenContours))
+    createPng(image, gottenContours)
+    # cropGlyph(cv2.bitwise_not(pimage), gottenContours[0], "41") 
